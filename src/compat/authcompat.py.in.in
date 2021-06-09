@@ -240,20 +240,6 @@ class Configuration:
 
             config.write(keys)
 
-    class Network(Base):
-        def __init__(self, options):
-            super(Configuration.Network, self).__init__(options)
-
-        def write(self):
-            nisdomain = self.get("nisdomain")
-            config = EnvironmentFile(Path.System('network'))
-
-            if nisdomain is None:
-                return
-
-            config.set("NISDOMAIN", nisdomain)
-            config.write()
-
     class SSSD(Base):
         def __init__(self, options):
             super(Configuration.SSSD, self).__init__(options, ServiceName="sssd")
@@ -375,83 +361,6 @@ class Configuration:
             # other applications may depend on it.
             return
 
-    class NIS(Base):
-        def __init__(self, options):
-            super(Configuration.NIS, self).__init__(options)
-            self.rpcbind = Service("rpcbind")
-            self.ypbind = Service("ypbind")
-
-        def isEnabled(self):
-            if not self.isset("nis"):
-                return None
-
-            return self.getBool("nis")
-
-        def enableService(self, nostart):
-            if not self.isset("nisdomain"):
-                return
-
-            nisdom = self.get("nisdomain")
-
-            if not nostart:
-                cmd = Command(Path.System('cmd-domainname'), [nisdom])
-                cmd.run()
-
-            cmd = Command(Path.System('cmd-setsebool'),
-                          ['-P', 'allow_ypbind', '1'])
-            cmd.run()
-
-            self.rpcbind.enable()
-            self.ypbind.enable()
-
-            if not nostart:
-                self.rpcbind.start(Restart=False)
-                self.ypbind.start()
-
-        def disableService(self, nostop):
-            if not nostop:
-                cmd = Command(Path.System('cmd-domainname'), ["(none)"])
-                cmd.run()
-
-            cmd = Command(Path.System('cmd-setsebool'),
-                          ['-P', 'allow_ypbind', '0'])
-            cmd.run()
-
-            self.rpcbind.disable()
-            self.ypbind.disable()
-
-            if not nostop:
-                self.rpcbind.stop()
-                self.ypbind.stop()
-
-        def write(self):
-            if not self.isset("nisdomain"):
-                return
-
-            output = "domain " + self.get("nisdomain")
-
-            additional_servers = []
-            if self.isset("nisserver"):
-                servers = self.get("nisserver").split(",")
-                additional_servers = servers[1:]
-                output += " server " + servers[0] + "\n"
-            else:
-                output += " broadcast\n"
-
-            for server in additional_servers:
-                output += "ypserver " + server + "\n"
-
-            filename = Path.System('yp.conf')
-            if self.getBool("test-call"):
-                print("========== BEGIN Content of [%s] ==========" % filename)
-                print(output)
-                print("========== END   Content of [%s] ==========\n" % filename)
-                return
-
-            with open(filename, "w") as f:
-                f.write(output)
-
-
 class AuthCompat:
     def __init__(self):
         self.sysconfig = EnvironmentFile(Path.System('authconfig'))
@@ -533,8 +442,6 @@ class AuthCompat:
         if (self.options.getBool("ldap") or self.options.getBool("ldapauth") or
                 self.options.getBool("sssd") or self.options.getBool("sssdauth")):
             profile = "sssd"
-        elif self.options.getBool("nis"):
-            profile = "nis"
         elif self.options.getBool("winbind"):
             profile = "winbind"
 
@@ -591,13 +498,11 @@ class AuthCompat:
     def writeConfiguration(self):
         configs = [
             Configuration.LDAP(self.options),
-            Configuration.Network(self.options),
             Configuration.Kerberos(self.options),
             Configuration.SSSD(self.options),
             Configuration.Winbind(self.options),
             Configuration.PWQuality(self.options),
             Configuration.MakeHomedir(self.options),
-            Configuration.NIS(self.options)
         ]
 
         for config in configs:

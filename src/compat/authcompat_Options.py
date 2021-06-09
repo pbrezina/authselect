@@ -79,9 +79,6 @@ class Options:
         # However, they will just make sure that an authentication against
         # expected service is working. They may not result in the exact same
         # configuration as authconfig would generate.
-        Option.Feature("nis",             _("NIS for user information by default")),
-        Option.Valued ("nisdomain",       _("<domain>"), _("default NIS domain")),
-        Option.Valued ("nisserver",       _("<server>"), _("default NIS server")),
         Option.Feature("ldap",            _("LDAP for user information by default")),
         Option.Feature("ldapauth",        _("LDAP for authentication by default")),
         Option.Valued ("ldapserver",      _("<server>"), _("default LDAP server hostname or URI")),
@@ -164,6 +161,11 @@ class Options:
         Option.UnsupportedFeature("locauthorize"),
         Option.UnsupportedFeature("sysnetauth"),
         Option.UnsupportedValued ("faillockargs", _("<options>")),
+
+        # NIS is no longer supported
+        Option.UnsupportedFeature("nis"),
+        Option.UnsupportedValued ("nisdomain", _("<domain>")),
+        Option.UnsupportedValued ("nisserver", _("<server>")),
     ]
 
     Map = {
