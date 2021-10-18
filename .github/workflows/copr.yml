@@ -1,0 +1,51 @@
+name: COPR
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, closed]
+jobs:
+  build:
+    if: ${{ github.event.pull_request.state }} == 'open'
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        dnf install -y rpmbuild
+    - name: Get version number
+      id: info
+      env:
+        PRID: ${{ github.event.pull_request.number }}
+      run: |
+        PROJECT="pr$PRID"
+        VERSION=`echo -e 'm4_include(version.m4)\nVERSION_NUMBER' | m4 -P | tail -n1`
+        RELEASE="$PROJECT.$GITHUB_RUN_NUMBER"
+
+        ::set-output name=project::$PROJECT
+        ::set-output name=version::$VERSION
+        ::set-output name=release::$RELEASE
+    - name: Build source rpm
+      env:
+        VERSION: ${{ steps.info.outputs.version }}
+        RELEASE: ${{ steps.info.outputs.release }}
+      run: |
+        set -e
+        set -x
+
+        TARBALL=authselect-$VERSION.tar.gz
+        tar -cvzf $TARBALL *
+
+        mkdir -p rpmbuild/BUILD
+        mkdir -p rpmbuild/RPMS
+        mkdir -p rpmbuild/SOURCES
+        mkdir -p rpmbuild/SPECS
+        mkdir -p rpmbuild/SRPMS
+
+        mv $TARBALL rpmbuild/SOURCES
+        cp rpms/authselect.spec.in rpmbuild/SPECS/authselect.spec
+
+        sed -iE "s/@PACKAGE_VERSION@/$VERSION/g" rpmbuild/SPECS/authselect.spec
+        sed -iE "s/@RELEASE_VERSION@/$RELEASE/g" rpmbuild/SPECS/authselect.spec
+
