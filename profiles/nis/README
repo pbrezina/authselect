@@ -27,6 +27,10 @@ with-ecryptfs::
 with-fingerprint::
     Enable authentication with fingerprint reader through *pam_fprintd*.
 
+with-oathtool::
+    Enable authentication with oathtool secrets through *pam_oath*.
+    User secrets expected in /etc/oathtool/users
+
 with-pam-u2f::
     Enable authentication via u2f dongle through *pam_u2f*.
 

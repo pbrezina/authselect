@@ -14,6 +14,7 @@ auth        [success=done authinfo_unavail=ignore ignore=ignore default=die] pam
 auth        sufficient                                   pam_unix.so {if not "without-nullok":nullok}
 auth        [default=1 ignore=ignore success=ok]         pam_usertype.so isregular
 auth        sufficient                                   pam_sss.so forward_pass
+auth        [user_unknown=ignore success=done]           pam_oath.so usersfile=/etc/oathtool/users              {include if "with-oathtool"}
 auth        required                                     pam_faillock.so authfail                               {include if "with-faillock"}
 auth        required                                     pam_deny.so
 
