@@ -1,0 +1,9 @@
+# Whitelist known warnings that can not be fixed
+addFilter("authselect.*: W: spelling-error %description -l en_US authconfig -> configuration");
+addFilter("authselect.*: W: non-conffile-in-etc /etc/bash_completion.d/authselect-completion.sh")
+addFilter("authselect-compat.*: W: self-obsoletion authconfig < 7.0.1-6 obsoletes authconfig")
+addFilter("authselect-compat.*: W: no-documentation")
+addFilter("authselect-compat.*: W: no-manual-page-for-binary authconfig")
+addFilter("authselect-devel.*: W: no-documentation")
+addFilter("authselect-libs.*: W: dangerous-command-in-%pre rm")
+addFilter("authselect-libs.*: W: dangerous-command-in-%posttrans cp")

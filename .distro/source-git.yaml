@@ -1,0 +1,20 @@
+upstream_project_url: ssh://git@github.com/authselect/authselect.git
+upstream_ref: 1.2.6
+downstream_package_name: authselect
+specfile_path: .distro/authselect.spec
+patch_generation_ignore_paths:
+- .distro
+patch_generation_patch_id_digits: 4
+sync_changelog: true
+files_to_sync:
+- src: .distro/
+  dest: .
+  delete: true
+  filters:
+  - protect .git*
+  - protect sources
+  - exclude source-git.yaml
+  - exclude .gitignore
+sources:
+- path: authselect-1.2.6.tar.gz
+  url: https://sources.stream.centos.org/sources/rpms/authselect/authselect-1.2.6.tar.gz/sha512/c89ea02f3f6c8018d42b99599744049e12caf87e9ed30173f52d4c8d97777cc33450b87fbb3b7d73129d096bff83525dd332e4919a1fbafa73e9af66d5c2dd61/authselect-1.2.6.tar.gz
