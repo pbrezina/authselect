@@ -1,0 +1,11 @@
+---  
+- hosts: localhost
+  tags:
+    - classic
+  roles:
+  - role: standard-test-basic
+    become: True
+    tests:
+    - simple:
+        dir: .
+        run: authselect list
