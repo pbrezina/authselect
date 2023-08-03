@@ -3,7 +3,7 @@
 
 Name:           authselect
 Version:        1.2.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Configures authentication and identity sources from supported profiles
 URL:            https://github.com/authselect/authselect
 
@@ -292,6 +292,11 @@ exit 0
 exit 0
 
 %changelog
+* Thu Aug 3 2023 Pavel Březina <pbrezina@redhat.com> - 1.2.6-2
+- Fix Japanese translations (RHBZ #2216755)
+- Update translations (RHBZ #2189557)
+- Do not prompt for password twice when changing password of local user (RHBZ #2179607)
+
 * Thu Dec 1 2022 Pavel Březina <pbrezina@redhat.com> - 1.2.6-1
 - Rebase to 1.2.6 (RHBZ #2142805)
 - Update translations (RHBZ #2139696)
